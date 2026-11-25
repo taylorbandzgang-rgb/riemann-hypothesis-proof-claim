@@ -186,6 +186,39 @@ content is manufactured; Alpöge (24 Nov 2026, X) stands by the check:
 "People seem to be reading this as me saying there's something wrong with
 the proof. I'm pretty confused. No? It literally checked out days ago?"
 
+## Update — 2026-11-25 (Zeng's audit: not load-bearing)
+
+A second independent audit followed (Zijian Zeng,
+ArtificialZeng/Riemann-hypothesis-Auditing, Pull Request #1, 23 Nov 2026),
+auditing Nielsen's objection directly on the full published export. Verdict:
+"the objection does not hold." The geometry slot Γ is write-only on the
+whole proof path — all consumers are proved for arbitrary Γ, HypsAlt does
+not mention it, nothing eliminates a `GeoCl` proof (`GeoCl.rec` is
+referenced by no declaration in the cone) — so filling it with `True` is
+the same as deleting it. 30 of 1,468,418 declarations depend on
+`anyGeometry`. Hygiene: 0 `axiom` declarations, 0 `native_decide` /
+`implemented_by` / `unsafe` / `opaque`, `sorry` only in the community-added
+`Challenge.lean`, no shadowing of Mathlib names, Mathlib pinned at official
+tag v4.33.1. Evidence: a `conescan` dependency analyser over the full
+61.57 GB export; `con-leche --verified --compare` exit 0, 1,468,418
+declarations accepted.
+
+HONESTY NOTE: Grok's summary of this audit describes ablations (deleting
+the geo field, or setting the predicate False) that still produce a
+kernel-accepted term. The literal delete-and-recheck experiment was NOT
+verified first-hand here; what Zeng's published audit establishes is the
+structural equivalent above. The paper attributes the ablation wording to
+Grok, not to a run verified by this check.
+
+Human unpacking has begun: Jimmie Adriazola (Arizona State) published a
+287-page human-readable manuscript on 24 Nov 2026 translating the Lean
+archive into conventional prose. It is a working document (no correctness
+guarantee, not a proof independent of the Lean development); §19 collects
+numbered hypotheses still open at the human-proof layer, and §17.4.3's
+shorter cohomological bound (K1) departs from the certified Lean route
+with no Lean certification. (Via the explainx.ai tracker, update of
+25 Nov 2026.)
+
 ## Verdict
 
 - The statements MATCH. All five headline statements in the published

@@ -41,6 +41,8 @@ Accessed 2026-11-25 (all times UTC) unless noted. No source, no claim.
 | A3 | James Shore — rh-proof-dependencies, dataset v0.2.1 | https://github.com/james-shore/rh-proof-dependencies | 2026-11-25 04:23 UTC | Kernel edge table the Rosetta path is checked against |
 | A4 | Harry Tong — rh-verification audit | https://github.com/harrytong/rh-verification/blob/main/stage1/code/RH_critics_dependency_findings.md | via Rosetta 2026-11-25 | Independent confirmation: anyGeometry in all five compiled dependency closures, second eight-edge path |
 | A5 | "Is the Riemann Hypothesis really solved?" FAQ | https://riemannhypothesissolved.com/faq/ | via search 2026-11-24 | Bailey (MathOverflow) and Bloom (X): definitions irrelevant if the term has the correct type; Alpöge (24 Nov 2026, X): "It literally checked out days ago?" |
+| A6 | Zeng, Z. — Independent audit of the "anyGeometry := True" objection (ArtificialZeng/Riemann-hypothesis-Auditing, PR #1, 23 Nov 2026) | https://github.com/ArtificialZeng/Riemann-hypothesis-Auditing/pull/1 | 2026-11-25 13:40 UTC | Verdict "the objection does not hold"; geometry slot write-only; 30 of 1,468,418 declarations depend on anyGeometry; hygiene counts; conescan + con-leche evidence |
+| A7 | explainx.ai tracker, "Riemann Hypothesis Proof Claim: Claimed vs Verified" (update of 25 Nov 2026) | https://explainx.ai/blog/levent-alpoge-anthropic-riemann-hypothesis-claude-lean-proof-claimed-vs-verified-2026 | 2026-11-25 | Adriazola 287-page manuscript (24 Nov 2026): working document, no correctness guarantee, §19 open hypotheses, §17.4.3 K1 bound uncertified |
 
 ## Domenic's own work (cited in the paper)
 
