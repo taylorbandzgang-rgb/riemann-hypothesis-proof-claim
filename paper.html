@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Riemann Hypothesis Proof Claim: What Was Claimed, What Was Checked, and What the Proof Says (So Far)</title>
+<style>
+@page { size: Letter; margin: 0; }
+* { box-sizing: border-box; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+body { margin:0; font-family:'Noto Serif','Liberation Serif',serif; color:#1a1a1a; font-size:10.5pt; line-height:1.55; }
+.page { min-height:11in; height:11in; padding:0.75in 0.85in 0.7in 0.85in; overflow:hidden; position:relative; }
+h1 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:25pt; line-height:1.18; margin:0 0 14pt 0; font-weight:700; }
+h2 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:14.5pt; line-height:1.25; margin:0 0 9pt 0; border-bottom:1.5pt solid #1a1a1a; padding-bottom:5pt; }
+h3 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:11pt; margin:14pt 0 5pt 0; }
+p { margin:0 0 8pt 0; text-align:justify; }
+.author { font-family:'Noto Sans',sans-serif; font-size:12pt; margin-bottom:4pt; }
+.sub { font-family:'Noto Sans',sans-serif; font-size:9.5pt; color:#444; margin-bottom:16pt; }
+.scope { border:1.2pt solid #7a1f1f; background:#fdf3f3; padding:10pt 12pt; margin:12pt 0; font-size:9.8pt; }
+.scope strong { color:#7a1f1f; }
+.note { border-left:3pt solid #666; background:#f4f4f2; padding:8pt 11pt; margin:10pt 0; font-size:9.8pt; }
+.taeft { border:1.2pt solid #205040; background:#f2f7f4; padding:10pt 12pt; margin:10pt 0; }
+code, .mono { font-family:'Liberation Mono',monospace; font-size:8.7pt; }
+pre { font-family:'Liberation Mono',monospace; font-size:8.4pt; line-height:1.4; background:#f4f4f2; border:0.6pt solid #ccc; padding:8pt 10pt; white-space:pre-wrap; word-wrap:break-word; margin:6pt 0 10pt 0; }
+table { width:100%; border-collapse:collapse; font-size:9.2pt; margin:8pt 0 12pt 0; font-family:'Noto Sans',sans-serif; }
+th { text-align:left; border-bottom:1.2pt solid #1a1a1a; padding:4pt 5pt; font-size:9pt; }
+td { border-bottom:0.5pt solid #ccc; padding:4pt 5pt; vertical-align:top; }
+ul, ol { margin:4pt 0 10pt 0; padding-left:18pt; }
+li { margin-bottom:4pt; text-align:justify; }
+.foot { position:absolute; bottom:0.45in; left:0.85in; right:0.85in; font-family:'Noto Sans',sans-serif; font-size:8pt; color:#777; display:flex; justify-content:space-between; border-top:0.5pt solid #ddd; padding-top:4pt; }
+.kicker { font-family:'Noto Sans',sans-serif; font-size:8.5pt; letter-spacing:1.6pt; text-transform:uppercase; color:#7a1f1f; margin-bottom:10pt; font-weight:700; }
+.eq { text-align:center; font-size:11.5pt; margin:10pt 0; font-style:italic; }
+.small { font-size:9.3pt; }
+a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
+</style></head><body>
+
+<div class="page">
+<div class="kicker">Independent reconstruction &middot; November 2026</div>
+<h1>The Riemann Hypothesis Proof Claim: What Was Claimed, What Was Checked, and What the Proof Says (So Far)</h1>
+<p class="author">Domenic Lipoma</p>
+<p class="sub">With Muse as research assistant &middot; 25 November 2026</p>
+<div class="scope"><strong>Honest scope &mdash; read this first.</strong> This paper reconstructs what is publicly known about a claimed proof of the Riemann hypothesis announced on 20 November 2026. It is <strong>not</strong> a peer-reviewed verification, and it does <strong>not</strong> reproduce the proof, which runs to roughly 17.4 million lines of Lean code across about 175,187 files. Section 3 reports a scoped check the author ran himself: whether the five headline theorems state what they are claimed to state. That check did not re-run the full kernel verification, which took 48 to 72 hours on university hardware. Where the ideas of the proof are not yet publicly explained, this paper says so, in those words, rather than filling the gap. Section 6 is the author's own commentary in his own framework, clearly marked, and is not part of the mathematics.</div>
+<p><strong>Abstract.</strong> On 20 November 2026, Levent Alp&ouml;ge, a mathematician at Anthropic, announced a proof of the Riemann hypothesis &mdash; and, in the same formalization, the Generalized Riemann Hypothesis for Dirichlet L-functions &mdash; built with Claude and written in the Lean proof assistant. Within a day, the Lean and Mathlib communities certified the statement and the proof. Independent researchers at MIT and the University of Waterloo compiled and checked the published export on their own machines. This paper explains, for a smart non-specialist, what the hypothesis says, what actually happened between 20 and 24 November, what an independent scoped check of the published statements found (including a definition, verified first-hand, that returns True for every input), what the proof's ideas are as far as they are publicly known, and what confirmation still requires.</p>
+<h3>Contents</h3>
+<p class="small">1. What the Riemann hypothesis says &nbsp;&middot;&nbsp; 2. What happened, 20&ndash;24 November 2026 &nbsp;&middot;&nbsp; 3. The scoped check we ran ourselves &nbsp;&middot;&nbsp; 4. The ideas of the proof, so far &nbsp;&middot;&nbsp; 5. What confirmation still needs &nbsp;&middot;&nbsp; 6. Reflection, by Domenic Lipoma &nbsp;&middot;&nbsp; Sources</p>
+<div class="foot"><span>Lipoma &mdash; The Riemann Hypothesis Proof Claim</span><span>1</span></div>
+</div>
+<div class="page">
+<h2>1. A single line that controls the primes</h2>
+<p>Start with a function built out of the counting numbers. For a complex number s whose real part is greater than 1, the Riemann zeta function is the sum</p>
+<p class="eq">&zeta;(s) = 1 + 1/2<sup>s</sup> + 1/3<sup>s</sup> + 1/4<sup>s</sup> + &hellip;</p>
+<p>That sum only converges on part of the complex plane, but the function it defines extends &mdash; uniquely, by analytic continuation &mdash; to the whole plane except for a single pole at s = 1. The extended function is still called &zeta;(s), and it is the object Bernhard Riemann studied in his 1859 paper, the only paper he ever published on number theory.</p>
+<p>A <em>zero</em> of &zeta; is a point where &zeta;(s) = 0. Some zeros are easy: &zeta; vanishes at the negative even integers, s = &minus;2, &minus;4, &minus;6, and so on. Those are called the <em>trivial</em> zeros, and they are fully understood. Every other zero is known to lie in the <em>critical strip</em>, the vertical band where the real part of s is strictly between 0 and 1. Those are the <em>nontrivial</em> zeros, and their exact positions are the mystery.</p>
+<p>The Riemann hypothesis makes a precise claim about them:</p>
+<div class="note"><strong>The Riemann hypothesis.</strong> Every nontrivial zero of the Riemann zeta function has real part exactly 1/2.</div>
+<p>In other words, every nontrivial zero lies on a single vertical line inside the strip, the <em>critical line</em> Re s = 1/2. Not near it. On it. The first few zeros, computed numerically long before any proof was claimed, sit at 1/2 + 14.134725&hellip;i, 1/2 + 21.022040&hellip;i, 1/2 + 25.010858&hellip;i, and so on up the line. The author's own numerical check of the first 1,000 zeros is described in Section 6; the 1,000th sits at height 1419.422481&hellip; above the real axis, still, in the computation, exactly on the line.</p>
+<p>Why does anyone care where these zeros sit? Because the zeros control the primes. The explicit formulas of analytic number theory express the error in counting primes &mdash; the gap between the prime-counting function &pi;(x) and its smooth approximation li(x) &mdash; in terms of the zeros. If every zero has real part 1/2, that error is as small as it can possibly be:</p>
+<p class="eq">&pi;(x) = li(x) + O(&radic;x log x)</p>
+<p>If even one zero sat off the line, the primes would wobble more than that around their smooth trend. The hypothesis is therefore not a curiosity about one function. It is a claim that the primes, for all their apparent irregularity, are distributed with the maximum regularity the formulas allow.</p>
+<div class="foot"><span>1 &middot; What the hypothesis says</span><span>2</span></div>
+</div>
+
+<div class="page">
+<h2>1. The precise statement, and its generalization</h2>
+<p>In the form in which it appears in Mathlib, Lean's mathematics library, the hypothesis is a single proposition. In ordinary notation it reads:</p>
+<div class="note">For every complex number s, if &zeta;(s) = 0, and s is not a trivial zero (s is not of the form &minus;2(n + 1) for a natural number n), and s &ne; 1, then the real part of s is 1/2.</div>
+<p>The s &ne; 1 condition excludes the pole; the other two conditions exclude the trivial zeros and the zeros outside the strip that are already understood. What remains is exactly the claim above. Section 3 gives this definition in its Lean form, because the whole question of what was proved turns on matching it character for character.</p>
+<h3>The generalized hypothesis</h3>
+<p>The zeta function is one member of a large family. For each Dirichlet character &chi; &mdash; a periodic, multiplicative pattern imposed on the integers &mdash; there is a Dirichlet L-function L(s, &chi;), built the same way as &zeta; but with the character weighting each term. The <em>Generalized Riemann Hypothesis</em> (GRH) claims the same line for all of them: every nontrivial zero of every Dirichlet L-function has real part 1/2.</p>
+<p>That distinction matters for this paper, because the November claim is a GRH claim, not only an RH claim. The formalization proves statements about Dirichlet L-functions in general, and the Riemann hypothesis for &zeta; itself follows as the special case. Its scope also has a stated limit: it covers Dirichlet L-functions. It does not, as published, cover Dedekind zeta functions, Hecke L-functions, or automorphic L-functions in general.</p>
+<h3>Why 166 years of failure is part of the story</h3>
+<p>Riemann stated the hypothesis in 1859 and noted, in effect, that he could not prove it and would set it aside. Generations of mathematicians did not set it aside. Enormous partial results accumulated &mdash; zero-free regions near the edge of the strip, density theorems, and rigorous computer verification of the first zeros up to height 3,000,175,332,800, about 12.4 trillion zeros, all on the line. None of that is a proof: the line is infinite, and one zero off it, at any height, would kill the hypothesis. The Clay Mathematics Institute lists it among its Millennium Prize Problems, with a prize of one million dollars. As of the date of this paper, Clay still lists it as unsolved, and no winner has been announced.</p>
+<div class="foot"><span>1 &middot; What the hypothesis says</span><span>3</span></div>
+</div>
+<div class="page">
+<h2>2. Five days in November 2026</h2>
+<table>
+<tr><th style="width:22%">Date</th><th>What happened</th></tr>
+<tr><td>20 Nov 2026</td><td>Levent Alp&ouml;ge posts the claim: a proof of GRH for Dirichlet L-functions, built with Claude, formalized in Lean. His announcement is a short remark (four pages) sketching the ideas and a compressed work timeline running from 6 October to 16 November.</td></tr>
+<tr><td>21 Nov 2026</td><td>The Lean FRO and the Mathlib Initiative publish a joint certification: they state they have full confidence and certify that both the statement and the proof are correct. At Waterloo, Michael Rubinstein completes an independent check the same day.</td></tr>
+<tr><td>20&ndash;24 Nov</td><td>At MIT, Andrew Sutherland compiles the full published export independently: Lean's default kernel accepts it after about 48 hours, a more paranoid kernel after about 72 hours, and standalone comparator tools pass. One final, slowest comparator stage is still running at last report.</td></tr>
+<tr><td>20&ndash;24 Nov</td><td>A critique by J. L. Nielsen argues that a geometry definition inside the proof is vacuous &mdash; it returns True for every input. The point is reported fairly in Sections 3 and 5. It remains unresolved.</td></tr>
+<tr><td>24 Nov 2026</td><td>The author of this paper publishes an independent numerical check of the first 1,000 zeta zeros, with code and results public, under his own name.</td></tr>
+</table>
+<h3>The size of the object</h3>
+<p>The proof is not a document a person reads. The published source runs to about 175,187 files and roughly 17.4 million lines &mdash; the independent record counts 15,531,759 non-blank lines and, strikingly, zero comments: the code does not explain itself. The unpacked exported proof is 61,570,595,788 bytes, about 61.6 gigabytes. Alp&ouml;ge himself has been blunt about the artifact: the Lean is, in his words on 23 November, "full of garbage obviously, but compiles," and he says he intends to understand the mathematics around it and to write a human account. A figure of "250,000 pages" circulated in coverage; Alp&ouml;ge later said that figure, from a footnote in his remark, was a joke. No such document exists.</p>
+<p>A separate human manuscript of about 940 pages, by Masullo, was posted on 20 November by Ravi Vakil. It is a different, unfinished, unverified draft. It is not the Lean proof, and nothing in this paper treats it as one.</p>
+<div class="foot"><span>2 &middot; What happened</span><span>4</span></div>
+</div>
+
+<div class="page">
+<h2>2. What "certified" does and does not mean</h2>
+<p>A Lean proof is checked by a small, trusted program called the <em>kernel</em>. The kernel does one job: it verifies that a proposed proof term really has the type it claims to have &mdash; that the argument, as formalized, establishes the stated proposition from Lean's axioms, with no gaps the type system can see. When the Lean and Mathlib communities certified the claim on 21 November, that is the core of what they were certifying, together with the separate check that the proposition being proved is the genuine Riemann hypothesis and not a look-alike.</p>
+<p>That second check matters more than it may sound. A kernel will happily verify a proof of a trivial or mis-stated proposition. So verifiers distinguish two questions:</p>
+<ol>
+<li><strong>Is the proof valid?</strong> Does the kernel accept the proof term for its declared type, with no reliance on an admitted gap (in Lean, the axiom <span class="mono">sorryAx</span>)?</li>
+<li><strong>Is the statement the real one?</strong> Does the declared type match, exactly, the statement mathematicians mean &mdash; here, Mathlib's own definition, imported from Mathlib rather than redefined locally?</li>
+</ol>
+<p>On the first question, the independent record is strong. Rubinstein's dependency-closure run found the main theorem depends on 1,478,198 declarations, and <span class="mono">sorryAx</span> is not among its dependencies. Sutherland's rebuild of the export in a sandbox came out byte-identical to the published export, and multiple independent checkers &mdash; the Lean kernel in two modes, the lake comparator in its completed stages, and the standalone tools con-leche, con-ron, and nanoda &mdash; accepted it.</p>
+<p>On the second question, Section 3 reports the author's own check.</p>
+<p>There is a third question neither kernel nor comparator answers, and it is the live one: <em>do the definitions inside the proof carry the mathematical content their names claim?</em> A kernel checks that a term has its declared type. It does not check whether a definition called "geometry" actually demands any geometry. That gap between type-correctness and intended content is where the open critique lives, and it is why "the kernels accept it" and "the proof is fully understood and confirmed" are not the same sentence.</p>
+<div class="foot"><span>2 &middot; What happened</span><span>5</span></div>
+</div>
+<div class="page">
+<h2>3. The scoped check we ran ourselves</h2>
+<p><strong>Question.</strong> Does the statement proved in the published export match Mathlib's <span class="mono">RiemannHypothesis</span> definition on the headline theorems?</p>
+<h3>Method</h3>
+<p>Three files were fetched first-hand, through the GitHub connector, from the <span class="mono">original</span> branch of the release repository (Deicyde/riemann-hypothesis, now leanprover-community/riemann-hypothesis), at commit <span class="mono">40e56bab026552e089d7afcfeff08d2defb9c005</span> &mdash; the unmodified copy of the first publicly released version, per the repository's own README. The files were <span class="mono">src/Statements.lean</span> (file SHA 1cd1bce9&hellip;), <span class="mono">src/Main.lean</span> (file SHA dbd5db70&hellip;), and one definitions file discussed below (file SHA c5fd1ea6&hellip;). Their contents were compared, term by term, against the five statements as quoted on Sutherland's verification page, where they appear exactly as in the challenge file, which imports only Mathlib.</p>
+<h3>Mathlib's definition</h3>
+<pre>def RiemannHypothesis : Prop :=
+  forall (s : Complex) (_ : riemannZeta s = 0)
+    (_ : not exists n : Nat, s = -2 * (n + 1))
+    (_ : s != 1), s.re = 1 / 2</pre>
+<p class="small">Rendered here in plain text; in Lean source the quantifiers and complex type use Lean's own notation. The definition text is corroborated identically by seven independent sources (Sutherland; Rubinstein; two independent verification repositories; safeguard.sh; a published arXiv formalization; and the Lean community blog, which links to Mathlib's official documentation page for the file). One limitation is stated plainly: the definition could not be pulled directly out of Mathlib's own repository with the tools available here, so that one text rests on seven-way corroboration rather than a first-hand read. The project side of the comparison &mdash; the side where a substitution would actually happen &mdash; was read first-hand.</p>
+<h3>The five headline theorems</h3>
+<pre>theorem riemannHypothesis : RiemannHypothesis
+theorem riemannZeta_eq_zero_re : RiemannZetaZerosOnLine
+theorem LFunction_ne_zero_of_half_lt_re
+    : DirichletLNonvanishingRightOfHalf
+theorem LFunction_eq_zero_re : DirichletLZerosOnLine
+theorem LFunction_eq_zero_re_of_isPrimitive
+    : PrimitiveDirichletLZerosOnLine</pre>
+<p>The key fact is in the first line. The theorem's type is the bare name <span class="mono">RiemannHypothesis</span>. That name is not defined anywhere in the project; it is imported from Mathlib. The other four theorems take their types from <span class="mono">Statements.lean</span>, a 16-line file that imports only Mathlib and whose four definitions were compared character by character with the challenge statements.</p>
+<div class="foot"><span>3 &middot; The scoped check</span><span>6</span></div>
+</div>
+
+<div class="page">
+<h2>3. Result: the statements match</h2>
+<table>
+<tr><th style="width:34%">Theorem</th><th style="width:14%">Match?</th><th>Basis</th></tr>
+<tr><td class="mono">riemannHypothesis</td><td><strong>Yes</strong></td><td>Type is Mathlib's imported name, not a local definition</td></tr>
+<tr><td class="mono">riemannZeta_eq_zero_re</td><td><strong>Yes</strong></td><td>Statements.lean text identical to challenge statement</td></tr>
+<tr><td class="mono">LFunction_ne_zero_of_half_lt_re</td><td><strong>Yes</strong></td><td>Identical: no zeros with Re s &gt; 1/2, with the stated exception</td></tr>
+<tr><td class="mono">LFunction_eq_zero_re</td><td><strong>Yes</strong></td><td>Identical: zeros in the strip have Re s = 1/2</td></tr>
+<tr><td class="mono">LFunction_eq_zero_re_of_isPrimitive</td><td><strong>Yes</strong></td><td>Identical, for primitive characters</td></tr>
+</table>
+<p>No discrepancy was found in the statements, and no local redefinition of the hypothesis or of <span class="mono">riemannZeta</span> was found in the files read. An independent inspection on 20 November reached the same finding on redefinition. This is the same comparison the comparator tools perform, and both the comparator and con-leche's comparison mode confirm the match on the verifiers' machines.</p>
+<h3>Hashes cross-checked</h3>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Source archive lean.tar.gz (239,275,554 bytes, 14 parts)</td><td class="mono">sha256 9631b4f020199e580ba86178cb56c6e9b09f690c2369a80dc4334aa93f49c7fc</td></tr>
+<tr><td>Exported proof, unpacked</td><td>61,570,595,788 bytes; sha256 5ea74b91&hellip;244e; Sutherland's sandboxed rebuild was byte-identical</td></tr>
+<tr><td>Main.olean</td><td class="mono">sha256 9146dfb4&hellip;796ad</td></tr>
+<tr><td>Pinned toolchain</td><td>Lean v4.33.1; Mathlib tag v4.33.1</td></tr>
+</table>
+<p class="small">Agreement on the source-archive hash spans Sutherland, Rubinstein (who downloaded it twice, on two machines), and an independent third-party inspection that downloaded and hashed it separately.</p>
+<h3>An independent sign the statements have real content</h3>
+<p>Sutherland combined the proof with an independent formalization of Robin-type criteria and obtained three theorems with no hypotheses and no mention of zeta zeros at all: Robin's inequality, Lagarias's inequality, and a cyclotomic corrected ideal Robin statement &mdash; concrete claims about divisor sums, stateable in plain arithmetic, and verified by the same machinery. That does not answer every question about the proof's internals, but it does show the proved statements are not empty formalism: they have teeth outside their own notation.</p>
+<div class="foot"><span>3 &middot; The scoped check</span><span>7</span></div>
+</div>
+<div class="page">
+<h2>3. What the check did not do, and the anyGeometry finding</h2>
+<div class="scope"><strong>Hard limits.</strong> The full 61.6 GB export was <strong>not</strong> downloaded here: checking it needs roughly 70 GB of disk and about 100 GB of RAM; this machine has 78 GB free and 6 GB of RAM. <strong>No kernel replay was run.</strong> Lean's default kernel took about 48 hours and the paranoid kernel about 72 hours, single-threaded, on MIT hardware, peaking at 82.6&ndash;98.8 GiB of memory. <strong>No comparator run was performed here</strong>; comparator and con-leche acceptances cited in this paper are Sutherland's and Rubinstein's results, reported as theirs. Nothing in this section should be read as an independent re-verification of the proof itself.</div>
+<h3>Verified first-hand: a predicate that demands nothing</h3>
+<p>One of Nielsen's central claims was checked directly against the original release, and it is accurate. In the definitions file fetched for this check, six lines below a definition that demands a genuine geometric witness, sits this one:</p>
+<pre>def anyGeometry : GeoP := fun _ _ _ => True</pre>
+<p>Read plainly: <span class="mono">anyGeometry</span> is a geometry predicate defined to return True for every input. It asks for nothing. The neighboring definition, <span class="mono">geoOf</span>, asks for a great deal &mdash; a positive constant and a genuine <span class="mono">IsGeoOf</span> witness, plus a true surface. The structure that consumes a geometry predicate takes it as a parameter, so whichever predicate is passed in is what its "geometry" field means. If <span class="mono">anyGeometry</span> is the one passed, that field is satisfied trivially, by definition.</p>
+<p>Two things were <em>not</em> established here. First, whether <span class="mono">anyGeometry</span> actually sits on the dependency path of the headline theorem was not checked; that requires the dependency-closure machinery the university verifiers ran. Second, Nielsen's further claims &mdash; a degenerate-geometry definition and a height step discharged by definitional equality &mdash; were not verified first-hand from source, only read in the critique and in an independent audit quoting it.</p>
+<p><strong>Verdict of the scoped check.</strong> The statements match: all five headline statements are exactly the statements in the Mathlib-only challenge file, and the headline theorem's type is Mathlib's own <span class="mono">RiemannHypothesis</span>. Separately, the <span class="mono">anyGeometry</span> definition is present in the original release exactly as the critique claims. That is a question about the proof's content, not about its statements, and it is unresolved as of 25 November 2026. A kernel checks that a term has its declared type. It does not check whether a definition carries its intended content.</p>
+<div class="foot"><span>3 &middot; The scoped check</span><span>8</span></div>
+</div>
+
+<div class="page">
+<h2>4. The shape of the proof, from the top</h2>
+<p>Rubinstein read the top of the proof by hand, and its spine is short enough to state. The headline theorem is discharged by a term whose structure is:</p>
+<pre>Main.riemannHypothesis
+  from rhOfAll
+  from allChi
+       -- no zeros of L(s, chi) for Re s &gt; 1/2,
+       -- for every character chi
+  ... 175,187 modules underneath</pre>
+<p>So the hard work is one statement: <em>no Dirichlet L-function has a zero strictly to the right of the critical line.</em> Everything else at the top level is a short, standard fold. If a zero lay strictly to the <em>left</em> of the line, inside the strip, the functional equation &mdash; applied to the conjugate character at the reflected point 1 &minus; s &mdash; would produce a zero to the right of the line, which the hard statement forbids. That closing argument lives in a single file on the critical line and the gamma factor, and Rubinstein read it directly. In other words: prove nothing lives right of the line, and symmetry leaves nowhere for a zero to be except on it.</p>
+<h3>A descendant of Stepanov</h3>
+<p>The proof's own ancestry, in Alp&ouml;ge's announcement, starts somewhere unexpected: function fields. Over curves over finite fields, the Riemann hypothesis is a theorem, and one classical route to it is Stepanov's method &mdash; a divisor argument whose power comes from <em>multiplicity</em>, roughly, from differentiating: building an auxiliary object that vanishes to high order at chosen points, then counting.</p>
+<p>Over the integers, that move has always been the problem. Alp&ouml;ge puts it directly: multiplicity is hard to find over the integers, corresponding to something like differentiating whole numbers. His four-page remark presents the entire proof as a descendant of Stepanov's argument that finds multiplicity over the integers anyway. Everything else in the sketch is machinery in service of that one idea: manufacture, inside ordinary number theory, the high-order vanishing that function fields provide for free.</p>
+<div class="foot"><span>4 &middot; The ideas of the proof</span><span>9</span></div>
+</div>
+<div class="page">
+<h2>4. Theta lifts, a chain of length &radic;X, and a sign</h2>
+<h3>Chaining theta lifts to manufacture multiplicity</h3>
+<p>The proposed source of multiplicity is a chain of <em>theta lifts</em> &mdash; constructions that move automorphic forms between groups, here iterated lifts between totally definite unitary groups. The announcement describes the lifts stepping through a sequence of groups, each lift gaining a "multiplicity" factor, with norms, level, and cancellation of the highest-order terms controlled through named classical inputs: Chowla&ndash;Selberg, Weyl, and Siegel's mass formula. A seesaw identity makes the period of the iterated lift a Bessel period independent of the Hecke characters involved.</p>
+<p>One quantitative claim in the remark stands out, and Alp&ouml;ge flags it himself as the line that should make mathematicians fall out of their chairs. For a von Mangoldt sum of length X &mdash; the weighted sum over prime powers that the explicit formulas put at the center of the theory &mdash; the suggested length of the chain of theta lifts, each link mimicking multiplicity, was:</p>
+<p class="eq">chain length = &radic;X</p>
+<p>Why the square root is the natural scale is part of what the sketch asserts rather than explains. It is recorded here as the claim, not as a derived fact.</p>
+<h3>The sign: Guinand&ndash;Weil</h3>
+<p>Multiplicity alone does not exclude zeros; an argument of this shape also needs a quantity that cannot cancel itself away. In the announcement, that role belongs to the Guinand&ndash;Weil explicit formula, which relates sums over zeros to sums over primes and, crucially, had the right sign. The sketch names a variance test-function trick, von Mangoldt sums, a quadric in paired variables, a definite sign obtained from middle cohomology via Bertini, Parseval iterated k times, and opposite signs preventing cancellation of inverse roots &mdash; closing with the instruction, in Alp&ouml;ge's own compressed style, to vectorize to go up dimensions.</p>
+<h3>The supporting timeline</h3>
+<p>The remark's 20-step timeline, from 6 October to 16 November, names the waypoints: a Stepanov determinant; a congruence on a CM curve for inert primes; a sixfold cover and automorphy; a determinant giving a non-negative quantity, described as "Stepanov with multiplicity one again; bootstrap"; the switch to the von Mangoldt function on 20 October; determinants containing Gan&ndash;Gross&ndash;Prasad periods; the Bost slope inequality; an Iwasawa tower argued by analogy with a pigeonhole principle over finite fields; a relative trace formula; a fight with a weakening of Vandiver's conjecture; covolumes, theta series indices, and congruences between lifts and forms &mdash; and, on 16 November, GRH.</p>
+<div class="foot"><span>4 &middot; The ideas of the proof</span><span>10</span></div>
+</div>
+
+<div class="page">
+<h2>4. What is not yet publicly explained</h2>
+<div class="scope"><strong>Gap, stated plainly.</strong> <em>How</em> the theta-lift chain actually produces the zero-free region &mdash; the mechanism, not the slogan &mdash; is <strong>not yet publicly explained</strong>. The announcement gives the shape (Stepanov, then multiplicity, then lifts, then the sign, then the conclusion) and a compressed timeline. It does not give a readable argument, and no human-readable account of the proof exists as of 25 November 2026. Alp&ouml;ge says he intends to write one. This paper does not invent a mechanism to fill that space.</div>
+<p>Alp&ouml;ge is candid about the sketch's own limits. A footnote warns that the parts of the timeline where Claude is the expert and he is not amount to paraphrasing a summary that, in his words, might make zero sense. He also says he may have baked many strange, suboptimal choices into the argument, and that he expects short arguments to follow fairly quickly &mdash; whether the proof can in fact be massively simplified is untested. The source itself offers no help to a reader: across more than 15.5 million non-blank lines, it contains zero comments.</p>
+<h3>What mathematicians who have looked say</h3>
+<ul>
+<li><strong>Terence Tao</strong>, in a preliminary review, said the proof appears to use the full power of modern developments in the Langlands program and arithmetic geometry.</li>
+<li><strong>Filippo Nuccio</strong> said it basically contains all number theory produced in the last 50 years, in all branches of the discipline.</li>
+<li><strong>Thomas Bloom</strong> described it as more algebraic in approach than a rival analytic proof of a weaker, quasi-Riemann result.</li>
+<li><strong>Andrew Granville</strong> criticized the clarity of the four-page sketch and its timing, one day after Anthropic's IPO.</li>
+<li><strong>Maksym Radziwi&#322;&#322;</strong> noted the lack of human understanding in the formalization, in contrast to what a traditional proof is expected to be.</li>
+</ul>
+<p>Those reactions frame the honest position. The formal object has passed machine checks of a kind no previous RH claim has ever survived. The human understanding of <em>why</em> it works &mdash; the thing mathematics usually means by a proof being known &mdash; does not yet exist in public.</p>
+<div class="foot"><span>4 &middot; The ideas of the proof</span><span>11</span></div>
+</div>
+<div class="page">
+<h2>5. Four things confirmation still needs</h2>
+<h3>1. The final lake-comparator stage</h3>
+<p>The comparator is the end-to-end tool that checks a proof export against a challenge statement in one audited pipeline. Its completed stages pass, at MIT and at Waterloo. At last report, the final stage of the slowest end-to-end run was still running. Until it finishes, the most conservative one-line summary of the machine verification is "accepted by the kernels and by the completed comparator stages," not "every pipeline has closed."</p>
+<h3>2. Human peer review</h3>
+<p>No human peer review of the proof has happened. That is not a formality being delayed by scheduling; at present there is no human-readable proof to review. Peer review in the ordinary sense waits on the prose account Alp&ouml;ge says he intends to write, and on mathematicians reconstructing, simplifying, and stress-testing the argument the way the reactions in Section 4 have only begun to do. Press coverage that ran ahead of this &mdash; one major magazine's updated headline declared the proof true on the strength of the machine checks &mdash; is stronger than the careful verification trackers, and this paper follows the trackers.</p>
+<h3>3. The anyGeometry question</h3>
+<p>Section 3 verified the definition first-hand: <span class="mono">anyGeometry</span> returns True for every input. What remains open is everything that would settle its significance &mdash; whether it lies on the dependency path of the headline theorem, and if it does, whether the argument at that point needs real geometric content or whether the trivial predicate is genuinely sufficient for what the proof asks of it. Nielsen's critique, which raises the point, is itself not peer-reviewed, and a second, independent audit confirmed the definition verbatim in the release while noting the critique's wider claims need the same scrutiny as the proof. Fair statement of the position: the definition is real, its role is unresolved, and kernels cannot settle it, because kernels check types, not intended content.</p>
+<h3>4. Clay</h3>
+<p>The Clay Mathematics Institute still lists the Riemann hypothesis among its unsolved Millennium Prize Problems, and no winner has been announced. Clay's process is its own: it does not move on the timetable of preprints, blog certifications, or headlines.</p>
+<div class="note"><strong>Bottom line.</strong> Statements: matched, first-hand, in Section 3. Machine verification: exceptionally strong, independently reproduced, with one comparator stage outstanding. Human understanding: not yet public. Definitional content: one verified, unresolved question. Prize status: unchanged. That is the whole position, and it is remarkable enough stated exactly.</div>
+<div class="foot"><span>5 &middot; What confirmation still needs</span><span>12</span></div>
+</div>
+
+<div class="page">
+<div class="kicker" style="color:#205040">Author's commentary &middot; Not part of the mathematics</div>
+<h2>6. Reflection &mdash; Domenic Lipoma</h2>
+<div class="taeft"><p style="margin:0"><strong>How to read this section.</strong> Everything above this page is standard mathematics and reported fact. Everything on this page is my own lens &mdash; TAEFT, The Eternal Fluctuation Theorem, my framework of a closed, recurring cosmos on a toroidal astroid manifold (Draft v1.2). TAEFT is <strong>not</strong> part of Alp&ouml;ge's proof. The proof does not use it, and the proof does not confirm it. This is how the episode looks from inside my own work, and nothing more.</p></div>
+<p>I came to this backwards from most people watching it. Before I asked for any check of the Lean statements, I computed. My own script, my own name, public code: the first 1,000 nontrivial zeros at 30-digit precision, every one with real part exactly 0.5, the value of &zeta; at each zero down at rounding level (worst case 9.24 &times; 10<sup>&minus;28</sup>), the first 100 redone at 50 digits agreeing to 1.2 &times; 10<sup>&minus;29</sup>, and the count itself right &mdash; the Riemann&ndash;von Mangoldt formula predicts 999.4 zeros up to the height of the 1,000th, and I found 1,000. That is evidence, not proof, and I have never called it anything else. But it is mine, and anyone can rerun it.</p>
+<p>In TAEFT, the universe is <em>Perpetua Mutatio</em> &mdash; eternal change inside a closed geometry, where what looks like disorder is a pattern recurring on a scale too large to see from inside one pass. That is how I have always read the zeros. A line of points, 1/2 + 14.134725i, 1/2 + 21.022040i, on and on past every height anyone has ever computed, never once stepping off the line: to me that reads as a recurrence. The primes look scattered, the way a signal looks like noise until you find the comb it repeats on. In my framework I call the measurable version of that <em>recurrence echoes</em> &mdash; repeat structure hiding inside apparent randomness. Searching the critical line, zero by zero, is listening for echoes. Finding a thousand of them, in order, on the line, is what a recurrence sounds like at small scale. I am not claiming the zeta zeros <em>are</em> TAEFT echoes. I am saying the habit of looking &mdash; assume the order is there, go listen for it, publish what you hear &mdash; is the same habit in both places, and it is mine.</p>
+<p>The part of this episode I trust most is not the headline. It is the hierarchy of checks, because TAEFT is built on a falsification hierarchy: rank your claims by what could kill them, and go looking for exactly that. This proof claim is going through the same discipline in public. The zeros can be recomputed &mdash; I did. The statements can be compared character by character &mdash; we did, and they matched. The kernel can be replayed by strangers on other continents &mdash; it was, twice over. And the weakest point was named out loud: a definition that returns True for everything, sitting where geometry was supposed to be. In my language, that is a cusp in the manifold &mdash; a place where the geometry pinches and you have to test whether the corridor is real or only a coordinate artifact. TAEFT's own rules say a vanishing metric component gets geodesic extension tests, not faith. The anyGeometry question deserves the same treatment: not dismissal, not panic &mdash; a test, run in the open, that could come back either way.</p>
+<div class="foot"><span>6 &middot; Reflection &mdash; author's commentary (TAEFT)</span><span>13</span></div>
+</div>
+
+<div class="page">
+<div class="kicker" style="color:#205040">Author's commentary, continued</div>
+<h2>6. Reflection &mdash; Domenic Lipoma (continued)</h2>
+<p>And Vacuum Diplomacy, my name for the scalar field &Psi; negotiating with the curvature it moves through, coupling &lambda; and all &mdash; if it belongs anywhere here, it is in the diplomacy between two kinds of knowing. A machine produced a 17-million-line object no human can read, and humans are now negotiating with it: replaying it, restating it, deriving plain arithmetic from it, arguing about one definition. Neither side gets to dictate. That negotiation <em>is</em> the confirmation process, and it is not finished. Recurrence Compression, dS/dt = &sigma;<sub>prod</sub> &minus; &sigma;<sub>comp</sub>, is my claim that a closed geometry compresses disorder back into pattern instead of letting it dissipate. A proof nobody understands yet, being compressed &mdash; if Alp&ouml;ge is right that short arguments follow &mdash; into something a person can hold: that would be the pattern asserting itself again. If the compression fails, if the corridor turns out to be an artifact, the hierarchy says we will know, and knowing is the point.</p>
+<p>I did not solve the Riemann hypothesis. I checked a thousand zeros, checked five statements, and wrote down, carefully, what is known and what is not. In a week when the loudest voices were either declaring victory or dismissing the whole thing, that felt like the right size of contribution &mdash; and it has my name on it, where anyone can check it.</p>
+<div class="foot"><span>6 &middot; Reflection &mdash; author's commentary (TAEFT)</span><span>14</span></div>
+</div>
+<div class="page">
+<h2>Sources</h2>
+<p class="small">All sources accessed 25 November 2026 unless noted. Primary sources were read first-hand; coverage marked "via search" or "via Wikipedia references" is reported as such.</p>
+<h3>Primary sources &mdash; the claim and the code</h3>
+<ul class="small">
+<li><strong>S1.</strong> Alp&ouml;ge, "Remark" (announcement PDF). https://alpo.ge/remark.pdf</li>
+<li><strong>S2.</strong> Release repository, original branch, commit 40e56bab026552e089d7afcfeff08d2defb9c005. https://github.com/Deicyde/riemann-hypothesis (now leanprover-community/riemann-hypothesis)</li>
+<li><strong>S3.</strong> Lean community blog, "Lean verification of the Riemann Hypothesis," joint statement of the Lean FRO and Mathlib Initiative, 21 Nov 2026. https://leanprover-community.github.io/blog/</li>
+<li><strong>S4.</strong> Sutherland (MIT), "RH Lean proof: verification files," updated 24 Nov 2026. https://math.mit.edu/~drew/grh/</li>
+<li><strong>S5.</strong> Rubinstein (Waterloo), "GRH Lean Check," checks complete 21 Nov 2026. https://mrubinst.github.io/grh-lean-verification/</li>
+<li><strong>S6.</strong> Mathlib documentation, Mathlib.NumberTheory.LSeries.RiemannZeta. https://leanprover-community.github.io/mathlib4_docs/Mathlib/NumberTheory/LSeries/RiemannZeta.html#RiemannHypothesis</li>
+</ul>
+<h3>The critique</h3>
+<ul class="small">
+<li><strong>C1.</strong> Nielsen, J. L., "The Invalidity of Alp&ouml;ge's Proof of the Riemann Hypothesis," PhilArchive, 20&ndash;21 Nov 2026. https://philarchive.org/archive/NIEIOT-2</li>
+<li><strong>C2.</strong> Independent audit (frankchu, DEV), "GRH proof's geometry is fun _ _ _ =&gt; True, in 24 files." https://dev.to/frankchu/grh-proofs-geometry-is-fun-true-in-24-files-2n2b</li>
+</ul>
+<h3>Coverage and context</h3>
+<ul class="small">
+<li><strong>R1.</strong> Scientific American, Howlett (20 Nov 2026) and Moskowitz (21 Nov 2026, updated). https://www.scientificamerican.com/article/anthropic-mathematician-claims-to-prove-riemann-hypothesis-most-famous-problem-in-all-of-math/</li>
+<li><strong>R2.</strong> Wikipedia, "Alp&ouml;ge proof of the Riemann hypothesis," crawled 24 Nov 2026. https://en.wikipedia.org/wiki/Alp%C3%B6ge_proof_of_the_Riemann_hypothesis</li>
+<li><strong>R3.</strong> explainx.ai tracker, "Riemann Hypothesis Proof Claim: Claimed vs Verified," updated 24 Nov 2026. https://explainx.ai/blog/levent-alpoge-anthropic-riemann-hypothesis-claude-lean-proof-claimed-vs-verified-2026</li>
+<li><strong>R4.</strong> Quanta Magazine, Kakaes (20 Nov 2026), via Wikipedia references.</li>
+<li><strong>R5.</strong> Nature, Castelvecchi (20 Nov 2026), via Wikipedia references.</li>
+<li><strong>R6.</strong> Wall Street Journal (23 Nov 2026). https://www.wsj.com/tech/ai/anthropic-mathematician-says-claude-has-solved-the-most-famous-problem-in-math-9361920b</li>
+</ul>
+<div class="foot"><span>Sources</span><span>15</span></div>
+</div>
+<div class="page">
+<h2>Sources, continued</h2>
+<h3>The author's own work</h3>
+<ul class="small">
+<li><strong>D1.</strong> Lipoma, D., independent numerical check of the first 1,000 zeta zeros (mpmath, 30-digit precision, 50-digit cross-check), 24 Nov 2026. https://github.com/taylorbandzgang-rgb/riemann-zero-check</li>
+<li><strong>D2.</strong> Lipoma, D., "The Eternal Fluctuation Theorem &mdash; Toy Effective Field Theory in a Toroidal Astroid Universe, Draft v1.2" (TAEFT white paper). Author's local file; cited only for Section 6.</li>
+</ul>
+<p class="small"><strong>A note on conflicts.</strong> Where press tone and the verification trackers disagreed &mdash; notably on how final the confirmation is &mdash; this paper follows Sutherland's page and the explainx tracker, which are the more careful records. The "250,000 pages" figure in early coverage was, by Alp&ouml;ge's own later statement, a joke from a footnote; no such document exists.</p>
+<div class="foot"><span>Sources</span><span>16</span></div>
+</div>
+</body></html>
