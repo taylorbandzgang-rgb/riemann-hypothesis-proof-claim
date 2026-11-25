@@ -6,16 +6,27 @@
 * { box-sizing: border-box; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 body { margin:0; font-family:'Noto Serif','Liberation Serif',serif; color:#1a1a1a; font-size:10.5pt; line-height:1.55; }
 .page { min-height:11in; height:11in; padding:0.75in 0.85in 0.7in 0.85in; overflow:hidden; position:relative; }
-h1 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:25pt; line-height:1.18; margin:0 0 14pt 0; font-weight:700; }
+h1 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:25pt; line-height:1.18; margin:0 0 10pt 0; font-weight:700; }
 h2 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:14.5pt; line-height:1.25; margin:0 0 9pt 0; border-bottom:1.5pt solid #1a1a1a; padding-bottom:5pt; }
 h3 { font-family:'Noto Sans','Liberation Sans',sans-serif; font-size:11pt; margin:14pt 0 5pt 0; }
 p { margin:0 0 8pt 0; text-align:justify; }
 .author { font-family:'Noto Sans',sans-serif; font-size:12pt; margin-bottom:4pt; }
-.sub { font-family:'Noto Sans',sans-serif; font-size:9.5pt; color:#444; margin-bottom:16pt; }
-.scope { border:1.2pt solid #7a1f1f; background:#fdf3f3; padding:10pt 12pt; margin:12pt 0; font-size:9.8pt; }
+.sub { font-family:'Noto Sans',sans-serif; font-size:9.5pt; color:#444; margin-bottom:10pt; }
+.scope { border:1.2pt solid #7a1f1f; background:#fdf3f3; padding:9pt 12pt; margin:9pt 0; font-size:9.8pt; }
 .scope strong { color:#7a1f1f; }
 .note { border-left:3pt solid #666; background:#f4f4f2; padding:8pt 11pt; margin:10pt 0; font-size:9.8pt; }
 .taeft { border:1.2pt solid #205040; background:#f2f7f4; padding:10pt 12pt; margin:10pt 0; }
+.update { border:1.2pt solid #1a4a7a; background:#eef3f8; padding:8pt 12pt; margin:8pt 0; font-size:9.8pt; }
+.update strong { color:#1a4a7a; }
+.compact { font-size:9.5pt; line-height:1.33; }
+.compact p { margin-bottom:5pt; }
+.compact h3 { margin:9pt 0 3pt 0; font-size:10.5pt; }
+.compact pre { padding:5pt 9pt; margin:3pt 0 7pt 0; }
+.compact .scope { padding:7pt 11pt; font-size:9.4pt; }
+.compact5 { font-size:10pt; line-height:1.45; }
+.compact5 p { margin-bottom:6pt; }
+.compact5 h3 { margin:10pt 0 4pt 0; font-size:10.5pt; }
+.compact5 .note { padding:7pt 11pt; margin:8pt 0; }
 code, .mono { font-family:'Liberation Mono',monospace; font-size:8.7pt; }
 pre { font-family:'Liberation Mono',monospace; font-size:8.4pt; line-height:1.4; background:#f4f4f2; border:0.6pt solid #ccc; padding:8pt 10pt; white-space:pre-wrap; word-wrap:break-word; margin:6pt 0 10pt 0; }
 table { width:100%; border-collapse:collapse; font-size:9.2pt; margin:8pt 0 12pt 0; font-family:'Noto Sans',sans-serif; }
@@ -36,8 +47,9 @@ a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
 <p class="author">Domenic Lipoma</p>
 <p class="sub">With Muse as research assistant &middot; 25 November 2026</p>
 <div class="scope"><strong>Honest scope &mdash; read this first.</strong> This paper reconstructs what is publicly known about a claimed proof of the Riemann hypothesis announced on 20 November 2026. It is <strong>not</strong> a peer-reviewed verification, and it does <strong>not</strong> reproduce the proof, which runs to roughly 17.4 million lines of Lean code across about 175,187 files. Section 3 reports a scoped check the author ran himself: whether the five headline theorems state what they are claimed to state. That check did not re-run the full kernel verification, which took 48 to 72 hours on university hardware. Where the ideas of the proof are not yet publicly explained, this paper says so, in those words, rather than filling the gap. Section 6 is the author's own commentary in his own framework, clearly marked, and is not part of the mathematics.</div>
+<div class="update"><strong>Update &mdash; 25 November 2026.</strong> The dependency question left open in the first version is now answered: <span class="mono">anyGeometry</span> is on the dependency path of the headline theorem, eight kernel-checked edges below <span class="mono">riemannHypothesis</span> (see Section 3), and the strict geometry is absent from the compiled closure. What remains open is not whether it is on the path, but whether it matters.</div>
 <p><strong>Abstract.</strong> On 20 November 2026, Levent Alp&ouml;ge, a mathematician at Anthropic, announced a proof of the Riemann hypothesis &mdash; and, in the same formalization, the Generalized Riemann Hypothesis for Dirichlet L-functions &mdash; built with Claude and written in the Lean proof assistant. Within a day, the Lean and Mathlib communities certified the statement and the proof. Independent researchers at MIT and the University of Waterloo compiled and checked the published export on their own machines. This paper explains, for a smart non-specialist, what the hypothesis says, what actually happened between 20 and 24 November, what an independent scoped check of the published statements found (including a definition, verified first-hand, that returns True for every input), what the proof's ideas are as far as they are publicly known, and what confirmation still requires.</p>
-<h3>Contents</h3>
+<h3 style="margin-top:8pt">Contents</h3>
 <p class="small">1. What the Riemann hypothesis says &nbsp;&middot;&nbsp; 2. What happened, 20&ndash;24 November 2026 &nbsp;&middot;&nbsp; 3. The scoped check we ran ourselves &nbsp;&middot;&nbsp; 4. The ideas of the proof, so far &nbsp;&middot;&nbsp; 5. What confirmation still needs &nbsp;&middot;&nbsp; 6. Reflection, by Domenic Lipoma &nbsp;&middot;&nbsp; Sources</p>
 <div class="foot"><span>Lipoma &mdash; The Riemann Hypothesis Proof Claim</span><span>1</span></div>
 </div>
@@ -57,7 +69,7 @@ a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
 </div>
 
 <div class="page">
-<h2>1. The precise statement, and its generalization</h2>
+<h2>1. The precise statement, and its generalization (continued)</h2>
 <p>In the form in which it appears in Mathlib, Lean's mathematics library, the hypothesis is a single proposition. In ordinary notation it reads:</p>
 <div class="note">For every complex number s, if &zeta;(s) = 0, and s is not a trivial zero (s is not of the form &minus;2(n + 1) for a natural number n), and s &ne; 1, then the real part of s is 1/2.</div>
 <p>The s &ne; 1 condition excludes the pole; the other two conditions exclude the trivial zeros and the zeros outside the strip that are already understood. What remains is exactly the claim above. Section 3 gives this definition in its Lean form, because the whole question of what was proved turns on matching it character for character.</p>
@@ -144,15 +156,25 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 <p>Sutherland combined the proof with an independent formalization of Robin-type criteria and obtained three theorems with no hypotheses and no mention of zeta zeros at all: Robin's inequality, Lagarias's inequality, and a cyclotomic corrected ideal Robin statement &mdash; concrete claims about divisor sums, stateable in plain arithmetic, and verified by the same machinery. That does not answer every question about the proof's internals, but it does show the proved statements are not empty formalism: they have teeth outside their own notation.</p>
 <div class="foot"><span>3 &middot; The scoped check</span><span>7</span></div>
 </div>
-<div class="page">
+<div class="page compact">
 <h2>3. What the check did not do, and the anyGeometry finding</h2>
 <div class="scope"><strong>Hard limits.</strong> The full 61.6 GB export was <strong>not</strong> downloaded here: checking it needs roughly 70 GB of disk and about 100 GB of RAM; this machine has 78 GB free and 6 GB of RAM. <strong>No kernel replay was run.</strong> Lean's default kernel took about 48 hours and the paranoid kernel about 72 hours, single-threaded, on MIT hardware, peaking at 82.6&ndash;98.8 GiB of memory. <strong>No comparator run was performed here</strong>; comparator and con-leche acceptances cited in this paper are Sutherland's and Rubinstein's results, reported as theirs. Nothing in this section should be read as an independent re-verification of the proof itself.</div>
 <h3>Verified first-hand: a predicate that demands nothing</h3>
 <p>One of Nielsen's central claims was checked directly against the original release, and it is accurate. In the definitions file fetched for this check, six lines below a definition that demands a genuine geometric witness, sits this one:</p>
 <pre>def anyGeometry : GeoP := fun _ _ _ => True</pre>
 <p>Read plainly: <span class="mono">anyGeometry</span> is a geometry predicate defined to return True for every input. It asks for nothing. The neighboring definition, <span class="mono">geoOf</span>, asks for a great deal &mdash; a positive constant and a genuine <span class="mono">IsGeoOf</span> witness, plus a true surface. The structure that consumes a geometry predicate takes it as a parameter, so whichever predicate is passed in is what its "geometry" field means. If <span class="mono">anyGeometry</span> is the one passed, that field is satisfied trivially, by definition.</p>
-<p>Two things were <em>not</em> established here. First, whether <span class="mono">anyGeometry</span> actually sits on the dependency path of the headline theorem was not checked; that requires the dependency-closure machinery the university verifiers ran. Second, Nielsen's further claims &mdash; a degenerate-geometry definition and a height step discharged by definitional equality &mdash; were not verified first-hand from source, only read in the critique and in an independent audit quoting it.</p>
-<p><strong>Verdict of the scoped check.</strong> The statements match: all five headline statements are exactly the statements in the Mathlib-only challenge file, and the headline theorem's type is Mathlib's own <span class="mono">RiemannHypothesis</span>. Separately, the <span class="mono">anyGeometry</span> definition is present in the original release exactly as the critique claims. That is a question about the proof's content, not about its statements, and it is unresolved as of 25 November 2026. A kernel checks that a term has its declared type. It does not check whether a definition carries its intended content.</p>
+<h3>Update, 25 November 2026: it is on the dependency path</h3>
+<p>That dependency question is now answered from published audit data read first-hand for this update. The Riemann Hypothesis Rosetta audit (<span class="mono">dial481/riemann-hypothesis-rosetta</span>, <span class="mono">results/anygeometry.md</span> and <span class="mono">results/anygeometry-path.tsv</span>) places <span class="mono">GlobalTheory.Mem.Top.Bl.anyGeometry</span> eight dependency edges below <span class="mono">riemannHypothesis</span> on a kernel-checked path. Each edge is a value edge in James Shore's kernel edge table (<span class="mono">rh-proof-dependencies</span>, dataset v0.2.1), and the search establishes that the path is shortest:</p>
+<pre style="font-size:8pt;line-height:1.32;padding:6pt 9pt;margin:4pt 0 8pt 0">riemannHypothesis -&gt; rhOfAll -&gt; allChi
+  -&gt; UpperTheory.FinalTheorems.everyCharacter
+  -&gt; UpperTheory.FinalTheorems.everyCharacter_of_row
+  -&gt; UpperTheory.LiteratureTheorems.every_character_of_literature_of_vWin
+  -&gt; UpperTheory.Lit.every_character_of_theta_integrals_local_matching
+  -&gt; GlobalTheory.Mem.Top.Bl.parametersOfDependence
+  -&gt; GlobalTheory.Mem.Top.Bl.anyGeometry</pre>
+<p>Harry Tong independently found <span class="mono">anyGeometry</span> in all five compiled dependency closures, via a second shortest path of eight edges: it shares steps 0&ndash;6 with the chain above, then passes through <span class="mono">UpperTheory.Lit.nonempty_hyps_definite_side_of_closed_bound</span>. The strict geometry is absent from the compiled proof: Shore records zero owned kernel constants and zero incident constant edges for <span class="mono">geoOf</span>, <span class="mono">GlobalTheory.ShFam.IsGeoOf</span>, and <span class="mono">GlobalTheory.ShFam.Pad.HasTrueSurf</span>. Only the trivial predicate is in the kernel closure. In total, 29 declarations refer directly to <span class="mono">anyGeometry</span>; 48 distinct declarations depend on it, 24 of them in the RH cone.</p>
+<p>Nielsen's further claims &mdash; a degenerate-geometry definition and a height step discharged by definitional equality &mdash; were not verified first-hand here, only read in the critique and in an audit quoting it.</p>
+<p><strong>Verdict of the scoped check, updated.</strong> The statements match: all five headline statements are exactly those in the Mathlib-only challenge file, and the headline theorem's type is Mathlib's own <span class="mono">RiemannHypothesis</span>. <span class="mono">anyGeometry</span> is present exactly as the critique claims, and is now confirmed on the dependency path. What remains open is whether it matters, not whether it is on the path. A kernel checks type, not intended content.</p>
 <div class="foot"><span>3 &middot; The scoped check</span><span>8</span></div>
 </div>
 
@@ -200,14 +222,15 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 <p>Those reactions frame the honest position. The formal object has passed machine checks of a kind no previous RH claim has ever survived. The human understanding of <em>why</em> it works &mdash; the thing mathematics usually means by a proof being known &mdash; does not yet exist in public.</p>
 <div class="foot"><span>4 &middot; The ideas of the proof</span><span>11</span></div>
 </div>
-<div class="page">
+<div class="page compact5">
 <h2>5. Four things confirmation still needs</h2>
 <h3>1. The final lake-comparator stage</h3>
 <p>The comparator is the end-to-end tool that checks a proof export against a challenge statement in one audited pipeline. Its completed stages pass, at MIT and at Waterloo. At last report, the final stage of the slowest end-to-end run was still running. Until it finishes, the most conservative one-line summary of the machine verification is "accepted by the kernels and by the completed comparator stages," not "every pipeline has closed."</p>
 <h3>2. Human peer review</h3>
 <p>No human peer review of the proof has happened. That is not a formality being delayed by scheduling; at present there is no human-readable proof to review. Peer review in the ordinary sense waits on the prose account Alp&ouml;ge says he intends to write, and on mathematicians reconstructing, simplifying, and stress-testing the argument the way the reactions in Section 4 have only begun to do. Press coverage that ran ahead of this &mdash; one major magazine's updated headline declared the proof true on the strength of the machine checks &mdash; is stronger than the careful verification trackers, and this paper follows the trackers.</p>
 <h3>3. The anyGeometry question</h3>
-<p>Section 3 verified the definition first-hand: <span class="mono">anyGeometry</span> returns True for every input. What remains open is everything that would settle its significance &mdash; whether it lies on the dependency path of the headline theorem, and if it does, whether the argument at that point needs real geometric content or whether the trivial predicate is genuinely sufficient for what the proof asks of it. Nielsen's critique, which raises the point, is itself not peer-reviewed, and a second, independent audit confirmed the definition verbatim in the release while noting the critique's wider claims need the same scrutiny as the proof. Fair statement of the position: the definition is real, its role is unresolved, and kernels cannot settle it, because kernels check types, not intended content.</p>
+<p>Section 3 verified the definition first-hand: <span class="mono">anyGeometry</span> returns True for every input. The update in Section 3 now confirms the second fact: it is on the dependency path of the headline theorem, eight kernel-checked edges below <span class="mono">riemannHypothesis</span>, confirmed independently by Harry Tong in all five compiled closures, while the strict geometry (<span class="mono">geoOf</span>, <span class="mono">IsGeoOf</span>, <span class="mono">HasTrueSurf</span>) has zero presence in the kernel closure. What remains open is its significance &mdash; whether the argument at that point needs real geometric content, or whether the trivial predicate is genuinely sufficient for what the proof asks of it.</p>
+<p>On that question the room splits. Chris Bailey (MathOverflow) and Thomas Bloom (X) argue that definitions are irrelevant as long as the term has the correct type, so a vacuously true part does not invalidate the proof. Nielsen maintains that the content is manufactured. Alp&ouml;ge responded on 24 November 2026 on X: &ldquo;People seem to be reading this as me saying there's something wrong with the proof. I'm pretty confused. No? It literally checked out days ago?&rdquo; Fair statement: the definition is real and it is on the path &mdash; both settled &mdash; and whether it matters is not settled, because kernels check types, not intended content. This paper does not claim the proof is valid or invalid on this finding.</p>
 <h3>4. Clay</h3>
 <p>The Clay Mathematics Institute still lists the Riemann hypothesis among its unsolved Millennium Prize Problems, and no winner has been announced. Clay's process is its own: it does not move on the timetable of preprints, blog certifications, or headlines.</p>
 <div class="note"><strong>Bottom line.</strong> Statements: matched, first-hand, in Section 3. Machine verification: exceptionally strong, independently reproduced, with one comparator stage outstanding. Human understanding: not yet public. Definitional content: one verified, unresolved question. Prize status: unchanged. That is the whole position, and it is remarkable enough stated exactly.</div>
@@ -261,6 +284,14 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 </div>
 <div class="page">
 <h2>Sources, continued</h2>
+<h3>The dependency audits &mdash; added 25 November 2026</h3>
+<ul class="small">
+<li><strong>A1.</strong> Riemann Hypothesis Rosetta (dial481), &ldquo;Where anyGeometry occurs in the checked RH proof,&rdquo; <span class="mono">results/anygeometry.md</span>. GitHub: dial481/riemann-hypothesis-rosetta. Accessed 25 November 2026.</li>
+<li><strong>A2.</strong> Riemann Hypothesis Rosetta (dial481), dependency path data, <span class="mono">results/anygeometry-path.tsv</span>. GitHub: dial481/riemann-hypothesis-rosetta. Accessed 25 November 2026.</li>
+<li><strong>A3.</strong> Shore, J., <span class="mono">rh-proof-dependencies</span>, kernel edge table, dataset v0.2.1. GitHub: james-shore/rh-proof-dependencies. Accessed 25 November 2026.</li>
+<li><strong>A4.</strong> Tong, H., RH / Dirichlet-GRH verification and critics' audit, 23 Nov 2026. GitHub: harrytong/rh-verification. Accessed 25 November 2026.</li>
+<li><strong>A5.</strong> FAQ page carrying the Bailey (MathOverflow) and Bloom (X) positions on anyGeometry. https://riemannhypothesissolved.com/faq/ Accessed 25 November 2026.</li>
+</ul>
 <h3>The author's own work</h3>
 <ul class="small">
 <li><strong>D1.</strong> Lipoma, D., independent numerical check of the first 1,000 zeta zeros (mpmath, 30-digit precision, 50-digit cross-check), 24 Nov 2026. https://github.com/taylorbandzgang-rgb/riemann-zero-check</li>

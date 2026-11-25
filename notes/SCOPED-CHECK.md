@@ -140,13 +140,51 @@ comparator and con-leche --compare confirm the match.
   con-leche/con-ron --compare acceptances are Sutherland's and Rubinstein's
   results, reported as theirs.
 - Whether `anyGeometry` is actually ON the dependency path of
-  `riemannHypothesis` was NOT checked. Rubinstein's dependency-closure run
+  `riemannHypothesis` was NOT checked [SUPERSEDED — see the Update section
+  below; answered 2026-11-25: it IS on the path, eight edges below]. Rubinstein's dependency-closure run
   says the main theorem depends on 1,478,198 declarations and `sorryAx` is
   not among them; I did not check whether `anyGeometry` is among them.
 - `geoDegenerate` and the `setDiv`/`hExpl6` height step from Nielsen's paper
   were NOT verified first-hand from source (only via Nielsen's paper and the
   DEV audit's quotes). The `anyGeometry` definition itself WAS verified
   first-hand (above).
+
+## Update — 2026-11-25 (dependency question ANSWERED)
+
+The dependency-path bullet above is now OUT OF DATE. On 2026-11-24 ~23:30 EST
+Muse verified first-hand from the Riemann Hypothesis Rosetta repo
+(dial481/riemann-hypothesis-rosetta, `results/anygeometry.md` and
+`results/anygeometry-path.tsv`): `GlobalTheory.Mem.Top.Bl.anyGeometry` is
+EIGHT dependency edges below `riemannHypothesis` on a kernel-checked path —
+each arrow a `value` edge in James Shore's kernel edge table
+(rh-proof-dependencies, dataset v0.2.1), and the backwards search establishes
+the path is shortest:
+
+`riemannHypothesis` → `rhOfAll` → `allChi` →
+`UpperTheory.FinalTheorems.everyCharacter` →
+`UpperTheory.FinalTheorems.everyCharacter_of_row` →
+`UpperTheory.LiteratureTheorems.every_character_of_literature_of_vWin` →
+`UpperTheory.Lit.every_character_of_theta_integrals_local_matching` →
+`GlobalTheory.Mem.Top.Bl.parametersOfDependence` →
+`GlobalTheory.Mem.Top.Bl.anyGeometry`
+
+Harry Tong independently found `anyGeometry` in all five compiled dependency
+closures, via a second shortest path of eight edges (shares steps 0–6, then
+through `UpperTheory.Lit.nonempty_hyps_definite_side_of_closed_bound`).
+
+The strict geometry is ABSENT from the compiled proof: Shore records zero
+owned kernel constants and zero incident constant edges for `geoOf`,
+`GlobalTheory.ShFam.IsGeoOf`, and `GlobalTheory.ShFam.Pad.HasTrueSurf`.
+Only the trivial predicate is in the kernel closure. 29 declarations refer
+directly to `anyGeometry`; 48 distinct declarations depend on it, 24 in the
+RH cone.
+
+What remains open is whether it MATTERS, not whether it is on the path:
+Chris Bailey (MathOverflow) and Thomas Bloom (X) argue definitions are
+irrelevant as long as the term has the correct type; Nielsen maintains the
+content is manufactured; Alpöge (24 Nov 2026, X) stands by the check:
+"People seem to be reading this as me saying there's something wrong with
+the proof. I'm pretty confused. No? It literally checked out days ago?"
 
 ## Verdict
 
@@ -159,5 +197,7 @@ comparator and con-leche --compare confirm the match.
   Nielsen claims. That is a real, first-hand finding, and it is a question
   about the proof's content, not about its statements: the kernels check
   that a term has its declared type; they do not check whether a definition
-  called "geometry" carries geometric content. That question is unresolved
-  as of 2026-11-25.
+  called "geometry" carries geometric content. UPDATE 2026-11-25: the
+  definition is confirmed ON the dependency path (eight kernel-checked edges
+  below riemannHypothesis — see the Update section above). Whether that fact
+  matters for the proof's content is still unresolved.

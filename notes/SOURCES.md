@@ -32,6 +32,16 @@ Accessed 2026-11-25 (all times UTC) unless noted. No source, no claim.
 | R5 | Nature, Castelvecchi (2026-11-20) — reactions | via Wikipedia refs | 2026-11-25 |
 | R6 | Wall Street Journal (2026-11-23) — claim, certification | https://www.wsj.com/tech/ai/anthropic-mathematician-says-claude-has-solved-the-most-famous-problem-in-math-9361920b | via search 2026-11-24 |
 
+## The dependency audits (added 2026-11-25)
+
+| # | Source | URL | Accessed | What it establishes |
+|---|---|---|---|---|
+| A1 | Riemann Hypothesis Rosetta — "Where `anyGeometry` occurs in the checked RH proof" | https://github.com/dial481/riemann-hypothesis-rosetta/blob/main/results/anygeometry.md | 2026-11-25 04:23 UTC | anyGeometry eight dependency edges below riemannHypothesis on a kernel-checked path; strict geometry (geoOf, IsGeoOf, HasTrueSurf) has zero kernel presence; 29 direct referrers, 48 dependents |
+| A2 | Rosetta — anygeometry-path.tsv (edge-by-edge data) | https://github.com/dial481/riemann-hypothesis-rosetta/blob/main/results/anygeometry-path.tsv | 2026-11-25 04:23 UTC | The eight value edges, with source file and line for each step; path is shortest |
+| A3 | James Shore — rh-proof-dependencies, dataset v0.2.1 | https://github.com/james-shore/rh-proof-dependencies | 2026-11-25 04:23 UTC | Kernel edge table the Rosetta path is checked against |
+| A4 | Harry Tong — rh-verification audit | https://github.com/harrytong/rh-verification/blob/main/stage1/code/RH_critics_dependency_findings.md | via Rosetta 2026-11-25 | Independent confirmation: anyGeometry in all five compiled dependency closures, second eight-edge path |
+| A5 | "Is the Riemann Hypothesis really solved?" FAQ | https://riemannhypothesissolved.com/faq/ | via search 2026-11-24 | Bailey (MathOverflow) and Bloom (X): definitions irrelevant if the term has the correct type; Alpöge (24 Nov 2026, X): "It literally checked out days ago?" |
+
 ## Domenic's own work (cited in the paper)
 
 | # | Source | URL |
