@@ -219,6 +219,24 @@ shorter cohomological bound (K1) departs from the certified Lean route
 with no Lean certification. (Via the explainx.ai tracker, update of
 25 Nov 2026.)
 
+## Update — 2026-11-25 (lake comparator finished: formal verification complete)
+
+The last machine check finished the same day. Andrew Sutherland announced
+on the Lean Prover Zulip (channel Riemann Hypothesis, 5:04 PM EST) that
+`lake comparator` finished: "Your solution is okay!", exit 0 at 4:49 PM EST
+(21:49 UTC) on 25 November 2026, after 122 hours 45 minutes — the last
+check running, nothing pending. Verified first-hand on Sutherland's MIT
+verification page (updated 22:05 UTC, 25 Nov 2026): "All checks have
+finished." The formal verification of the proof is now complete end to end:
+all five headline theorems depend only on the three standard axioms, every
+module replayed through the Lean kernel, two independent kernels accept the
+full export, and the comparator confirms all five theorems against the
+challenge. Human peer review is still pending, and Clay still lists the
+Riemann Hypothesis as unsolved. The paper is now v1.3, recording this
+finish. Also noted on Sutherland's page, not reviewed here: a shorter Lean
+proof was published on 25 November 2026, with its checks recorded on a
+separate page.
+
 ## Verdict
 
 - The statements MATCH. All five headline statements in the published

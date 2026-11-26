@@ -39,10 +39,10 @@ li { margin-bottom:4pt; text-align:justify; }
 .eq { text-align:center; font-size:11.5pt; margin:10pt 0; font-style:italic; }
 .small { font-size:9.3pt; }
 a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
-.cover { padding-top:0.6in; }
-.cover h1 { font-size:22pt; margin-bottom:7pt; }
-.cover .scope { padding:7pt 11pt; margin:6pt 0; }
-.cover .update { padding:6pt 11pt; margin:6pt 0; }
+.cover { padding-top:0.5in; }
+.cover h1 { font-size:22pt; margin-bottom:4pt; }
+.cover .scope { padding:7pt 11pt; margin:5pt 0; line-height:1.42; }
+.cover .update { padding:6pt 11pt; margin:5pt 0; line-height:1.42; }
 .cover h3 { margin:6pt 0 3pt 0; }
 </style></head><body>
 
@@ -50,12 +50,12 @@ a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
 <div class="kicker">Independent reconstruction &middot; November 2026</div>
 <h1>The Riemann Hypothesis Proof Claim: What Was Claimed, What Was Checked, and What the Proof Says (So Far)</h1>
 <p class="author">Domenic Lipoma</p>
-<p class="sub">With Muse as research assistant &middot; 25 November 2026</p>
+<p class="sub">With Muse as research assistant &middot; Version 1.3 &middot; 25 November 2026</p>
 <div class="scope"><strong>Honest scope &mdash; read this first.</strong> This paper reconstructs what is publicly known about a claimed proof of the Riemann hypothesis announced on 20 November 2026. It is <strong>not</strong> a peer-reviewed verification, and it does <strong>not</strong> reproduce the proof, which runs to roughly 17.4 million lines of Lean code across about 175,187 files. Section 3 reports a scoped check the author ran himself: whether the five headline theorems state what they are claimed to state. That check did not re-run the full kernel verification, which took 48 to 72 hours on university hardware. Where the ideas of the proof are not yet publicly explained, this paper says so, in those words, rather than filling the gap. Section 6 is the author's own commentary in his own framework, clearly marked, and is not part of the mathematics.</div>
-<div class="update"><strong>Update &mdash; 25 November 2026.</strong> The dependency question left open in the first version is now answered: <span class="mono">anyGeometry</span> is on the dependency path of the headline theorem, eight kernel-checked edges below <span class="mono">riemannHypothesis</span> (see Section 3), and the strict geometry is absent from the compiled closure. A second independent audit, by Zijian Zeng, finds the vacuous definition is not load-bearing for formal correctness: the geometry slot is write-only along the proof path, and only 30 of 1,468,418 declarations depend on it. Human unpacking of the analytic core has also begun, with Jimmie Adriazola&rsquo;s 287-page manuscript translating the Lean archive into conventional prose (see Sections 3 and 5).</div>
-<p><strong>Abstract.</strong> On 20 November 2026, Levent Alp&ouml;ge, a mathematician at Anthropic, announced a proof of the Riemann hypothesis &mdash; and, in the same formalization, the Generalized Riemann Hypothesis for Dirichlet L-functions &mdash; built with Claude and written in the Lean proof assistant. Within a day, the Lean and Mathlib communities certified the statement and the proof. Independent researchers at MIT and the University of Waterloo compiled and checked the published export on their own machines. This paper explains, for a smart non-specialist, what the hypothesis says, what actually happened between 20 and 24 November, what an independent scoped check of the published statements found (including a definition, verified first-hand, that returns True for every input), what the proof's ideas are as far as they are publicly known, and what confirmation still requires.</p>
+<div class="update"><strong>Update &mdash; 25 November 2026.</strong> The dependency question left open in the first version is now answered: <span class="mono">anyGeometry</span> is on the dependency path of the headline theorem, eight kernel-checked edges below <span class="mono">riemannHypothesis</span> (see Section 3), and the strict geometry is absent from the compiled closure. A second independent audit, by Zijian Zeng, finds the vacuous definition is not load-bearing for formal correctness: the geometry slot is write-only along the proof path, and only 30 of 1,468,418 declarations depend on it. Human unpacking of the analytic core has also begun, with Jimmie Adriazola&rsquo;s 287-page manuscript translating the Lean archive into conventional prose (see Sections 3 and 5). The final lake-comparator stage has also finished (&ldquo;Your solution is okay!&rdquo;, exit 0, 25 November 2026): formal verification is complete end to end. Peer review is still pending, and Clay still lists the hypothesis as unsolved.</div>
+<p><strong>Abstract.</strong> On 20 November 2026, Levent Alp&ouml;ge, a mathematician at Anthropic, announced a proof of the Riemann hypothesis &mdash; and, in the same formalization, the Generalized Riemann Hypothesis for Dirichlet L-functions &mdash; built with Claude and written in the Lean proof assistant. Within a day, the Lean and Mathlib communities certified the statement and the proof. Independent researchers at MIT and the University of Waterloo compiled and checked the published export on their own machines. This paper explains, for a smart non-specialist, what the hypothesis says, what actually happened between 20 and 25 November, what an independent scoped check of the published statements found (including a definition, verified first-hand, that returns True for every input), what the proof's ideas are as far as they are publicly known, and what confirmation still requires.</p>
 <h3 style="margin-top:8pt">Contents</h3>
-<p class="small">1. What the Riemann hypothesis says &nbsp;&middot;&nbsp; 2. What happened, 20&ndash;24 November 2026 &nbsp;&middot;&nbsp; 3. The scoped check we ran ourselves &nbsp;&middot;&nbsp; 4. The ideas of the proof, so far &nbsp;&middot;&nbsp; 5. What confirmation still needs &nbsp;&middot;&nbsp; 6. Reflection, by Domenic Lipoma &nbsp;&middot;&nbsp; Sources</p>
+<p class="small">1. What the Riemann hypothesis says &nbsp;&middot;&nbsp; 2. What happened, 20&ndash;25 November 2026 &nbsp;&middot;&nbsp; 3. The scoped check we ran ourselves &nbsp;&middot;&nbsp; 4. The ideas of the proof, so far &nbsp;&middot;&nbsp; 5. What confirmation still needs &nbsp;&middot;&nbsp; 6. Reflection, by Domenic Lipoma &nbsp;&middot;&nbsp; Sources</p>
 <div class="foot"><span>Lipoma &mdash; The Riemann Hypothesis Proof Claim</span><span>1</span></div>
 </div>
 <div class="page">
@@ -86,14 +86,15 @@ a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
 <div class="foot"><span>1 &middot; What the hypothesis says</span><span>3</span></div>
 </div>
 <div class="page">
-<h2>2. Five days in November 2026</h2>
+<h2>2. Six days in November 2026</h2>
 <table>
 <tr><th style="width:22%">Date</th><th>What happened</th></tr>
 <tr><td>20 Nov 2026</td><td>Levent Alp&ouml;ge posts the claim: a proof of GRH for Dirichlet L-functions, built with Claude, formalized in Lean. His announcement is a short remark (four pages) sketching the ideas and a compressed work timeline running from 6 October to 16 November.</td></tr>
 <tr><td>21 Nov 2026</td><td>The Lean FRO and the Mathlib Initiative publish a joint certification: they state they have full confidence and certify that both the statement and the proof are correct. At Waterloo, Michael Rubinstein completes an independent check the same day.</td></tr>
-<tr><td>20&ndash;24 Nov</td><td>At MIT, Andrew Sutherland compiles the full published export independently: Lean's default kernel accepts it after about 48 hours, a more paranoid kernel after about 72 hours, and standalone comparator tools pass. One final, slowest comparator stage is still running at last report.</td></tr>
+<tr><td>20&ndash;24 Nov</td><td>At MIT, Andrew Sutherland compiles the full published export independently: Lean's default kernel accepts it after about 48 hours, a more paranoid kernel after about 72 hours, and standalone comparator tools pass.</td></tr>
 <tr><td>20&ndash;24 Nov</td><td>A critique by J. L. Nielsen argues that a geometry definition inside the proof is vacuous &mdash; it returns True for every input. The point is reported fairly in Sections 3 and 5. It remains unresolved.</td></tr>
 <tr><td>24 Nov 2026</td><td>The author of this paper publishes an independent numerical check of the first 1,000 zeta zeros, with code and results public, under his own name.</td></tr>
+<tr><td>25 Nov 2026</td><td>The final lake-comparator stage finishes: &ldquo;Your solution is okay!&rdquo;, exit 0 at 4:49 PM EST (21:49 UTC), after 122 hours 45 minutes. Andrew Sutherland announces it on the Lean Zulip, and his MIT verification page now reads &ldquo;All checks have finished&rdquo; &mdash; nothing is pending. A shorter Lean proof is also published on 25 November; its checks are recorded on a separate page and are not reviewed here.</td></tr>
 </table>
 <h3>The size of the object</h3>
 <p>The proof is not a document a person reads. The published source runs to about 175,187 files and roughly 17.4 million lines &mdash; the independent record counts 15,531,759 non-blank lines and, strikingly, zero comments: the code does not explain itself. The unpacked exported proof is 61,570,595,788 bytes, about 61.6 gigabytes. Alp&ouml;ge himself has been blunt about the artifact: the Lean is, in his words on 23 November, "full of garbage obviously, but compiles," and he says he intends to understand the mathematics around it and to write a human account. A figure of "250,000 pages" circulated in coverage; Alp&ouml;ge later said that figure, from a footnote in his remark, was a joke. No such document exists.</p>
@@ -109,7 +110,7 @@ a { color:#1a4a7a; text-decoration:none; word-break:break-all; }
 <li><strong>Is the proof valid?</strong> Does the kernel accept the proof term for its declared type, with no reliance on an admitted gap (in Lean, the axiom <span class="mono">sorryAx</span>)?</li>
 <li><strong>Is the statement the real one?</strong> Does the declared type match, exactly, the statement mathematicians mean &mdash; here, Mathlib's own definition, imported from Mathlib rather than redefined locally?</li>
 </ol>
-<p>On the first question, the independent record is strong. Rubinstein's dependency-closure run found the main theorem depends on 1,478,198 declarations, and <span class="mono">sorryAx</span> is not among its dependencies. Sutherland's rebuild of the export in a sandbox came out byte-identical to the published export, and multiple independent checkers &mdash; the Lean kernel in two modes, the lake comparator in its completed stages, and the standalone tools con-leche, con-ron, and nanoda &mdash; accepted it.</p>
+<p>On the first question, the independent record is strong. Rubinstein's dependency-closure run found the main theorem depends on 1,478,198 declarations, and <span class="mono">sorryAx</span> is not among its dependencies. Sutherland's rebuild of the export in a sandbox came out byte-identical to the published export, and multiple independent checkers &mdash; the Lean kernel in two modes, the lake comparator, and the standalone tools con-leche, con-ron, and nanoda &mdash; accepted it. The comparator&rsquo;s final stage finished on 25 November 2026, so no machine check remains pending (see Section 5).</p>
 <p>On the second question, Section 3 reports the author's own check.</p>
 <p>There is a third question neither kernel nor comparator answers, and it is the live one: <em>do the definitions inside the proof carry the mathematical content their names claim?</em> A kernel checks that a term has its declared type. It does not check whether a definition called "geometry" actually demands any geometry. That gap between type-correctness and intended content is where the open critique lives, and it is why "the kernels accept it" and "the proof is fully understood and confirmed" are not the same sentence.</p>
 <div class="foot"><span>2 &middot; What happened</span><span>5</span></div>
@@ -241,9 +242,9 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 <div class="foot"><span>4 &middot; The ideas of the proof</span><span>12</span></div>
 </div>
 <div class="page compact">
-<h2>5. Four things confirmation still needs</h2>
-<h3>1. The final lake-comparator stage</h3>
-<p>The comparator is the end-to-end tool that checks a proof export against a challenge statement in one audited pipeline. Its completed stages pass, at MIT and at Waterloo. At last report, the final stage of the slowest end-to-end run was still running. Until it finishes, the most conservative one-line summary of the machine verification is "accepted by the kernels and by the completed comparator stages," not "every pipeline has closed."</p>
+<h2>5. What confirmation still needs</h2>
+<h3>1. The lake comparator &mdash; finished 25 November 2026</h3>
+<p>The comparator is the end-to-end tool that checks a proof export against a challenge statement in one audited pipeline. Its final stage has now finished: on 25 November 2026 it reported &ldquo;Your solution is okay!&rdquo;, exit 0 at 4:49 PM EST (21:49 UTC), after 122 hours 45 minutes. Sutherland announced the finish on the Lean Zulip, and his MIT page now reads &ldquo;All checks have finished&rdquo; &mdash; nothing is pending, and the formal verification is complete end to end. A shorter Lean proof published the same day, its checks on a separate page, is not reviewed here.</p>
 <h3>2. Human peer review</h3>
 <p>No human peer review of the proof has happened. That is not a formality being delayed by scheduling. Peer review in the ordinary sense waits on a vetted prose account, and on mathematicians reconstructing, simplifying, and stress-testing the argument the way the reactions in Section 4 have only begun to do. Adriazola&rsquo;s manuscript is the first working translation toward one; its &sect;19 open hypotheses and its uncertified &sect;17.4.3 K1 bound are covered in item 3 below. Press coverage that ran ahead of this &mdash; one major magazine's updated headline declared the proof true on the strength of the machine checks &mdash; is stronger than the careful verification trackers, and this paper follows the trackers.</p>
 <h3>3. The anyGeometry question</h3>
@@ -252,7 +253,7 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 <p>The positions remain as stated, attributed to their holders. Chris Bailey (MathOverflow) and Thomas Bloom (X) argue definitions are irrelevant as long as the term has the correct type. Nielsen maintains, as her position, that the content is manufactured. Alp&ouml;ge responded on 24 November 2026 on X: &ldquo;People seem to be reading this as me saying there's something wrong with the proof. I'm pretty confused. No? It literally checked out days ago?&rdquo; This paper stays neutral: it does not claim the proof is valid or invalid.</p>
 <h3>4. Clay</h3>
 <p>The Clay Mathematics Institute still lists the Riemann hypothesis among its unsolved Millennium Prize Problems, and no winner has been announced. Clay's process is its own: it does not move on the timetable of preprints, blog certifications, or headlines.</p>
-<div class="note"><strong>Bottom line.</strong> Statements: matched, first-hand, in Section 3. Machine verification: exceptionally strong, independently reproduced, with one comparator stage outstanding. Human understanding: unpacking begun, in a working manuscript that guarantees nothing. Definitional content: on the path, and per Zeng not load-bearing for formal correctness; the analytic core still awaits human unpacking. Prize status: unchanged. That is the whole position, and it is remarkable enough stated exactly.</div>
+<div class="note"><strong>Bottom line.</strong> Statements: matched, first-hand, in Section 3. Machine verification: complete end to end &mdash; kernels and lake comparator alike &mdash; and independently reproduced. Human understanding: unpacking begun, in a working manuscript that guarantees nothing. Definitional content: on the path, and per Zeng not load-bearing for formal correctness; the analytic core still awaits human unpacking. Prize status: unchanged. That is the whole position, and it is remarkable enough stated exactly.</div>
 <div class="foot"><span>5 &middot; What confirmation still needs</span><span>13</span></div>
 </div>
 
@@ -281,7 +282,7 @@ theorem LFunction_eq_zero_re_of_isPrimitive
 <li><strong>S1.</strong> Alp&ouml;ge, "Remark" (announcement PDF). https://alpo.ge/remark.pdf</li>
 <li><strong>S2.</strong> Release repository, original branch, commit 40e56bab026552e089d7afcfeff08d2defb9c005. https://github.com/Deicyde/riemann-hypothesis (now leanprover-community/riemann-hypothesis)</li>
 <li><strong>S3.</strong> Lean community blog, "Lean verification of the Riemann Hypothesis," joint statement of the Lean FRO and Mathlib Initiative, 21 Nov 2026. https://leanprover-community.github.io/blog/</li>
-<li><strong>S4.</strong> Sutherland (MIT), "RH Lean proof: verification files," updated 24 Nov 2026. https://math.mit.edu/~drew/grh/</li>
+<li><strong>S4.</strong> Sutherland (MIT), "RH Lean proof: verification files," updated 25 Nov 2026. https://math.mit.edu/~drew/grh/</li>
 <li><strong>S5.</strong> Rubinstein (Waterloo), "GRH Lean Check," checks complete 21 Nov 2026. https://mrubinst.github.io/grh-lean-verification/</li>
 <li><strong>S6.</strong> Mathlib documentation, Mathlib.NumberTheory.LSeries.RiemannZeta. https://leanprover-community.github.io/mathlib4_docs/Mathlib/NumberTheory/LSeries/RiemannZeta.html#RiemannHypothesis</li>
 </ul>
